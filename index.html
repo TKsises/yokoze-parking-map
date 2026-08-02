@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>YOKOZE Atlas 2026 | 横瀬町 駐車場 空間資源マップ</title>
+
+<link rel="stylesheet" href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css" />
+<link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+<header class="app-header">
+  <h1>横瀬町 駐車場 空間資源マップ <span class="app-subtitle">YOKOZE Atlas 2026</span></h1>
+  <p class="app-description">
+    駐車場「検索」アプリではなく、町の空間資源の在庫表です。総容量ではなく、来訪者が実際に利用できる
+    <b>実効キャパシティ</b>（access=yes または未設定のみ算入。月極・私有地・店舗専用は除外）を中核指標として可視化します。
+  </p>
+</header>
+
+<div id="status-bar" class="status-bar status-info">初期化中...</div>
+
+<main class="app-main">
+  <aside class="sidebar">
+
+    <section class="panel">
+      <h2>データ</h2>
+      <button id="btn-refresh" class="btn btn-primary">データ取得・更新</button>
+      <div class="field">
+        <label for="select-basemap">ベースマップ</label>
+        <select id="select-basemap"></select>
+      </div>
+    </section>
+
+    <section class="panel">
+      <h2>フィルタ</h2>
+      <label class="checkbox-field"><input type="checkbox" id="filter-effective" /> 実効キャパのみ表示</label>
+      <label class="checkbox-field"><input type="checkbox" id="filter-free" /> 無料のみ</label>
+      <label class="checkbox-field"><input type="checkbox" id="filter-needscheck" /> 要現地確認のみ</label>
+      <div class="field">
+        <label for="filter-minarea">面積 ○㎡以上</label>
+        <input type="number" id="filter-minarea" min="0" step="10" value="0" />
+      </div>
+      <div id="result-count" class="result-count"></div>
+    </section>
+
+    <section class="panel">
+      <h2>集計</h2>
+      <div id="summary-panel"></div>
+    </section>
+
+    <section class="panel">
+      <h2>面積規模ランキング（転用ポテンシャル検討材料）</h2>
+      <div id="ranking-panel"></div>
+    </section>
+
+    <section class="panel">
+      <h2>ダウンロード</h2>
+      <div class="field-row">
+        <div class="field">
+          <label for="download-classification">分類</label>
+          <select id="download-classification"></select>
+        </div>
+        <div class="field">
+          <label for="download-version">版番号</label>
+          <input type="text" id="download-version" placeholder="0.1.0" />
+        </div>
+        <div class="field">
+          <label for="download-initials">作成者</label>
+          <input type="text" id="download-initials" placeholder="TK" />
+        </div>
+      </div>
+      <button id="btn-download-geojson" class="btn">GeoJSONダウンロード</button>
+      <button id="btn-download-csv" class="btn">一覧CSVダウンロード</button>
+      <button id="btn-download-fieldcheck" class="btn btn-warning">要現地確認リストCSV</button>
+    </section>
+
+    <section class="panel">
+      <h2>拡張レイヤー</h2>
+      <label class="checkbox-field"><input type="checkbox" id="aerial-toggle" /> ドローン空撮タイルを重畳</label>
+      <div class="field">
+        <label for="aerial-url">空撮タイルURL（{z}/{x}/{y}テンプレート）</label>
+        <input type="text" id="aerial-url" placeholder="https://tiles.openaerialmap.org/{id}/0/{id2}/{z}/{x}/{y}" />
+      </div>
+      <div class="field">
+        <label for="aerial-opacity">不透明度</label>
+        <input type="range" id="aerial-opacity" min="0" max="1" step="0.05" value="0.8" />
+      </div>
+      <label class="checkbox-field"><input type="checkbox" id="custom-toggle" /> 現地調査GeoJSONを重畳</label>
+      <div class="field">
+        <input type="file" id="custom-geojson-input" accept=".geojson,.json" />
+      </div>
+    </section>
+
+  </aside>
+
+  <section class="content">
+    <div id="map" class="map"></div>
+    <div class="table-wrapper">
+      <table id="parking-table">
+        <thead><tr></tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </section>
+</main>
+
+<footer class="attribution-bar">
+  地図データ: © <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap contributors</a>
+  （<a href="https://opendatacommons.org/licenses/odbl/" target="_blank" rel="noopener">ODbL</a>）
+  ／ タイル: <a href="https://openfreemap.org/" target="_blank" rel="noopener">OpenFreeMap</a>
+  ／ 地理院タイル: <a href="https://maps.gsi.go.jp/development/ichiran.html" target="_blank" rel="noopener">国土地理院</a>
+</footer>
+
+<script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
+<script src="https://unpkg.com/@turf/turf@6.5.0/turf.min.js"></script>
+<script src="https://unpkg.com/osmtogeojson@3.0.0-beta.5/osmtogeojson.js"></script>
+
+<script src="js/config.js"></script>
+<script src="js/overpass.js"></script>
+<script src="js/classify.js"></script>
+<script src="js/filters.js"></script>
+<script src="js/mapView.js"></script>
+<script src="js/tableView.js"></script>
+<script src="js/summaryView.js"></script>
+<script src="js/download.js"></script>
+<script src="js/main.js"></script>
+</body>
+</html>
