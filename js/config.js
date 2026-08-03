@@ -64,9 +64,9 @@ out geom;`;
 
   // 区分ごとの色・ラベル
   categoryColors: {
-    available: '#2e7d32',
-    conditional: '#ef6c00',
-    excluded: '#9e9e9e'
+    available: '#1E7A4D',
+    conditional: '#C2600A',
+    excluded: '#8A938E'
   },
   categoryLabels: {
     available: '利用可（実効キャパ）',

@@ -6,6 +6,14 @@
 <title>YOKOZE Atlas 2026 | 横瀬町 駐車場 空間資源マップ</title>
 
 <link rel="stylesheet" href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css" />
+
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link
+  href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Noto+Sans+JP:wght@400;500;700&display=swap"
+  rel="stylesheet"
+/>
+
 <link rel="stylesheet" href="css/style.css" />
 </head>
 <body>
@@ -95,7 +103,25 @@
   </aside>
 
   <section class="content">
-    <div id="map" class="map"></div>
+    <div class="map-wrap">
+      <div id="map" class="map"></div>
+
+      <div class="map-overlay map-overlay-legend">
+        <div class="map-overlay-title">区分</div>
+        <ul class="capacity-legend compact">
+          <li><span class="dot dot-available"></span>利用可</li>
+          <li><span class="dot dot-conditional"></span>条件付き</li>
+          <li><span class="dot dot-excluded"></span>除外</li>
+        </ul>
+      </div>
+
+      <div class="map-overlay map-overlay-kpi">
+        <div class="map-overlay-title">実効キャパシティ</div>
+        <div class="map-overlay-kpi-value">
+          <span id="map-kpi-effective" class="mono-num">-</span><span class="map-overlay-kpi-unit">台</span>
+        </div>
+      </div>
+    </div>
     <div class="table-wrapper">
       <table id="parking-table">
         <thead><tr></tr></thead>

@@ -60,20 +60,21 @@ window.ParkingTableView = (function () {
       const p = f.properties;
       const tr = document.createElement('tr');
       tr.dataset.no = p._no;
-      if (p._isEstimated) tr.classList.add('row-estimated');
-      if (p._needsFieldCheck) tr.classList.add('row-needs-check');
 
-      const countText = p._count === null ? '不明' : `${fmtNum(p._count)}${p._isEstimated ? '(推定)' : ''}`;
+      const countText =
+        p._count === null
+          ? '-'
+          : `<span class="mono-num">${fmtNum(p._count)}</span>${p._isEstimated ? '<span class="count-tag">推定</span>' : ''}`;
 
       tr.innerHTML = `
-        <td>${p._no}</td>
+        <td class="mono-num">${p._no}</td>
         <td>${escapeHtml(p._name)}</td>
-        <td><span class="badge badge-${p._category}">${escapeHtml(p._categoryLabel)}</span></td>
-        <td>${p._areaSqm !== null ? fmtNum(p._areaSqm, 1) : '-'}</td>
+        <td><span class="badge-dot"><span class="dot dot-${p._category}"></span>${escapeHtml(p._categoryLabel)}</span></td>
+        <td class="mono-num">${p._areaSqm !== null ? fmtNum(p._areaSqm, 1) : '-'}</td>
         <td>${countText}</td>
         <td>${escapeHtml(p.fee || '不明')}</td>
         <td>${escapeHtml(p._accessRaw)}</td>
-        <td>${p._needsFieldCheck ? '⚠ 要確認' : ''}</td>
+        <td>${p._needsFieldCheck ? '<span class="fieldcheck-chip">要確認</span>' : ''}</td>
       `;
       tr.addEventListener('click', () => onRowClick && onRowClick(p._no));
       frag.appendChild(tr);

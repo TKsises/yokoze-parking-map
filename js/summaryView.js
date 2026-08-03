@@ -10,33 +10,34 @@ window.ParkingSummaryView = (function () {
     const c = aggregates.conditional;
     const e = aggregates.excluded;
 
+    // 積み上げバーの比率（台数ベース。総台数0件のときはゼロ割りを避ける）
+    const denom = t.count > 0 ? t.count : 1;
+    const pct = (n) => (n / denom) * 100;
+
     containerEl.innerHTML = `
-      <div class="summary-grid">
-        <div class="summary-card summary-total">
-          <h4>総キャパシティ（全区分）</h4>
-          <div class="summary-row"><span>駐車場数</span><b>${fmtNum(t.num)} 件</b></div>
-          <div class="summary-row"><span>総面積</span><b>${fmtNum(t.areaSqm, 0)} ㎡</b></div>
-          <div class="summary-row"><span>総台数</span><b>${fmtNum(t.count)} 台</b></div>
-        </div>
-        <div class="summary-card summary-effective">
-          <h4>実効キャパシティ（利用可のみ）</h4>
-          <div class="summary-row"><span>駐車場数</span><b>${fmtNum(a.num)} 件</b></div>
-          <div class="summary-row"><span>面積</span><b>${fmtNum(a.areaSqm, 0)} ㎡</b></div>
-          <div class="summary-row"><span>台数</span><b>${fmtNum(a.count)} 台</b></div>
-        </div>
-        <div class="summary-card summary-sub">
-          <h4>条件付き（利用者専用等）</h4>
-          <div class="summary-row"><span>件数</span><b>${fmtNum(c.num)}</b></div>
-          <div class="summary-row"><span>台数</span><b>${fmtNum(c.count)}</b></div>
-        </div>
-        <div class="summary-card summary-sub">
-          <h4>除外（私有・月極等）</h4>
-          <div class="summary-row"><span>件数</span><b>${fmtNum(e.num)}</b></div>
-          <div class="summary-row"><span>台数</span><b>${fmtNum(e.count)}</b></div>
+      <div class="kpi-hero">
+        <div class="kpi-hero-label">実効キャパシティ（利用可のみ）</div>
+        <div class="kpi-hero-value"><span class="mono-num">${fmtNum(a.count)}</span><span class="kpi-hero-unit">台</span></div>
+        <div class="kpi-hero-sub">総容量 <span class="mono-num">${fmtNum(t.count)}</span>台（<span class="mono-num">${fmtNum(t.num)}</span>件）</div>
+      </div>
+      <div class="capacity-bar">
+        <div class="capacity-bar-track">
+          <div class="capacity-bar-seg seg-available" style="width:${pct(a.count)}%"></div>
+          <div class="capacity-bar-seg seg-conditional" style="width:${pct(c.count)}%"></div>
+          <div class="capacity-bar-seg seg-excluded" style="width:${pct(e.count)}%"></div>
         </div>
       </div>
-      <div class="summary-flag">要現地確認: ${fmtNum(aggregates.needsFieldCheckNum)} 件</div>
+      <ul class="capacity-legend">
+        <li><span class="dot dot-available"></span>利用可<b class="mono-num">${fmtNum(a.count)}台</b></li>
+        <li><span class="dot dot-conditional"></span>条件付き<b class="mono-num">${fmtNum(c.count)}台</b></li>
+        <li><span class="dot dot-excluded"></span>除外<b class="mono-num">${fmtNum(e.count)}台</b></li>
+      </ul>
+      <div class="fieldcheck-tag">要現地確認 <span class="mono-num">${fmtNum(aggregates.needsFieldCheckNum)}</span>件</div>
     `;
+
+    // 地図オーバーレイのKPI表示も同じ集計値で更新する（表示先が違うだけの同一データ）
+    const mapKpiEl = document.getElementById('map-kpi-effective');
+    if (mapKpiEl) mapKpiEl.textContent = fmtNum(a.count);
   }
 
   function renderRanking(containerEl, features, topN, onSelect) {
@@ -51,9 +52,9 @@ window.ParkingSummaryView = (function () {
     ranked.forEach((f) => {
       const p = f.properties;
       const li = document.createElement('li');
-      li.innerHTML = `<span class="badge badge-${p._category}">${escapeHtml(p._categoryLabel)}</span>
+      li.innerHTML = `<span class="badge-dot"><span class="dot dot-${p._category}"></span></span>
         <span class="ranking-name">${escapeHtml(p._name)}</span>
-        <span class="ranking-area">${fmtNum(p._areaSqm, 0)} ㎡</span>`;
+        <span class="ranking-area mono-num">${fmtNum(p._areaSqm, 0)} ㎡</span>`;
       li.addEventListener('click', () => onSelect && onSelect(p._no));
       ol.appendChild(li);
     });
